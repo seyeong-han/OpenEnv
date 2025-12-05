@@ -197,7 +197,25 @@ class HTTPEnvServer:
 
                     elif method == "tools/call":
                         tool_name = params.get("name")
+                        if not tool_name:
+                            return {
+                                "jsonrpc": "2.0",
+                                "error": {
+                                    "code": -32602,
+                                    "message": "Missing required 'name' parameter",
+                                },
+                                "id": request_id,
+                            }
                         arguments = params.get("arguments", {})
+                        if not isinstance(arguments, dict):
+                            return {
+                                "jsonrpc": "2.0",
+                                "error": {
+                                    "code": -32602,
+                                    "message": "'arguments' must be an object",
+                                },
+                                "id": request_id,
+                            }
                         result = await self.env.mcp_client.call_tool(
                             tool_name, arguments
                         )
@@ -255,9 +273,12 @@ class HTTPEnvServer:
             tool_name = action_data.get("tool_name")
             if tool_name is None:
                 raise ValueError("Missing required field 'tool_name' for CallToolAction")
+            parameters = action_data.get("parameters", {})
+            if not isinstance(parameters, dict):
+                raise ValueError("'parameters' must be an object for CallToolAction")
             return CallToolAction(
                 tool_name=tool_name,
-                parameters=action_data.get("parameters", {}),
+                parameters=parameters,
             )
 
         # Otherwise, use the environment-specific action class
