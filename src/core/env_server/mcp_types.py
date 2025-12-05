@@ -12,9 +12,47 @@ Python's built-in types module.
 """
 
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from .types import Action, Observation
+
+
+class ToolErrorType(Enum):
+    """Types of errors that can occur during tool execution."""
+
+    INVALID_ARGUMENTS = "invalid_arguments"
+    TOOL_NOT_FOUND = "tool_not_found"
+    EXECUTION_ERROR = "execution_error"
+    TIMEOUT = "timeout"
+
+
+@dataclass
+class ToolError:
+    """
+    Structured error for tool call failures.
+
+    Used for transport/validation errors. Tool execution errors that are
+    part of normal operation should be returned in the result field.
+    """
+
+    error_type: ToolErrorType
+    message: str
+    details: Optional[Dict[str, Any]] = None
+
+
+@dataclass
+class Tool:
+    """
+    Strongly typed representation of an MCP tool.
+
+    Follows the MCP specification for tool definitions.
+    """
+
+    name: str
+    description: str
+    input_schema: Dict[str, Any]
+    output_schema: Optional[Dict[str, Any]] = None
 
 
 @dataclass(kw_only=True)
@@ -49,7 +87,7 @@ class ListToolsObservation(Observation):
     Contains the list of available tools with their schemas.
     """
 
-    tools: List[Dict[str, Any]] = field(default_factory=list)
+    tools: List[Tool] = field(default_factory=list)
 
 
 @dataclass(kw_only=True)
@@ -57,9 +95,11 @@ class CallToolObservation(Observation):
     """
     Observation returned from CallToolAction.
 
-    Contains the result of calling a tool, or an error if the call failed.
+    Contains the result of calling a tool. The error field is for
+    transport/validation errors only - tool execution errors should
+    be part of the result.
     """
 
-    result: Optional[Any] = None
-    error: Optional[str] = None
-    tool_name: Optional[str] = None
+    tool_name: str
+    result: Any = None
+    error: Optional[ToolError] = None

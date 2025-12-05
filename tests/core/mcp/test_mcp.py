@@ -58,7 +58,7 @@ async def test_echo_env_mcp_integration():
     assert not obs.done
     assert hasattr(obs, "tools")
     assert len(obs.tools) == 1
-    assert obs.tools[0]["name"] == "echo_message"
+    assert obs.tools[0].name == "echo_message"
 
     # Test CallToolAction
     call_action = CallToolAction(

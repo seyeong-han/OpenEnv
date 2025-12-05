@@ -15,6 +15,9 @@ from .mcp_types import (
     CallToolObservation,
     ListToolsAction,
     ListToolsObservation,
+    Tool,
+    ToolError,
+    ToolErrorType,
 )
 from .types import Action, Observation, State
 from .web_interface import create_web_interface_app, WebInterfaceManager
@@ -33,6 +36,9 @@ __all__ = [
     "Observation",
     "ListToolsObservation",
     "CallToolObservation",
+    "Tool",
+    "ToolError",
+    "ToolErrorType",
     "State",
     # Base transforms
     "CompositeTransform",
