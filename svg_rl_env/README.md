@@ -218,6 +218,39 @@ for episode in range(num_episodes):
 
 Qwen2.5-VL can be used as the policy to optimize SVG code with rendering-aware rewards (arxiv 2505.20793).
 
+### Option 1: Training via HTTP API (Recommended for Testing)
+
+Start the server and trigger training via REST API:
+
+```bash
+# Terminal 1: Start the server
+uvicorn svg_rl_env.server.app:app --reload
+
+# Terminal 2: Start training
+curl -X POST http://localhost:8000/api/training/start \
+     -H "Content-Type: application/json" \
+     -d '{"episodes": 1, "max_env_steps": 2}'
+```
+
+Monitor training status:
+```bash
+curl http://localhost:8000/api/training/status
+```
+
+Control training:
+```bash
+# Pause training
+curl -X POST http://localhost:8000/api/training/pause
+
+# Resume training
+curl -X POST http://localhost:8000/api/training/resume
+
+# Stop training
+curl -X POST http://localhost:8000/api/training/stop
+```
+
+### Option 2: Command Line Training
+
 1. Install optional dependencies:  
    ```bash
    pip install -e .[qwen]
@@ -231,7 +264,10 @@ Qwen2.5-VL can be used as the policy to optimize SVG code with rendering-aware r
    ```bash
    python -m svg_rl_env.qwen_svg_rl infer --checkpoint qwen_svg_rl_checkpoints/best
    ```
-4. The trainer queries Qwen2.5-VL with the target image + current metrics, renders via the environment, and applies a policy-gradient update to maximize the visual reward. See `svg_rl_env/qwen_svg_rl.py` for details.
+
+### How It Works
+
+The trainer queries Qwen2.5-VL with the target image + current metrics, renders via the environment, and applies a policy-gradient update to maximize the visual reward. See `svg_rl_env/qwen_svg_rl.py` for details.
 
 ## Comparison with Paper
 
