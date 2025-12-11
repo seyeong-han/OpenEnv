@@ -1,0 +1,56 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openenv-svg_rl_env"
+version = "0.1.0"
+description = "Svg Rl Env environment for OpenEnv"
+requires-python = ">=3.10"
+dependencies = [
+    # Core OpenEnv dependencies (required for server functionality)
+    # "openenv-core @ git+https://github.com/meta-pytorch/OpenEnv.git@main#subdirectory=src/core",
+    "openenv-core>=0.1.0",
+    "fastapi>=0.115.0",
+    "pydantic>=2.0.0",
+    "uvicorn>=0.24.0",
+    "requests>=2.31.0",
+    # WebSocket support for real-time monitoring
+    "python-socketio>=5.10.0",
+    "aiohttp>=3.9.0",
+    # Environment-specific dependencies for SVG rendering and image comparison
+    "numpy>=1.19.0",
+    "pillow>=10.0.0",  # Image processing
+    "cairosvg>=2.7.0",  # SVG to PNG rendering
+    "scikit-image>=0.21.0",  # Image similarity metrics
+    "opencv-python>=4.8.0",  # Advanced image processing
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+]
+qwen = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "transformers>=4.40.0",
+    "accelerate>=0.27.0",
+    "qwen-vl-utils>=0.0.1",
+]
+
+[project.scripts]
+# Server entry point - enables running via: uv run --project . server
+# or: python -m svg_rl_env.server.app
+server = "svg_rl_env.server.app:main"
+
+[tool.setuptools]
+include-package-data = true
+packages = ["svg_rl_env", "svg_rl_env.server"]
+package-dir = { "svg_rl_env" = ".", "svg_rl_env.server" = "server" }
